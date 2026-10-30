@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Friday">
+  <!-- A rounded house with a four-point star cut clean through it, so whatever
+       is behind shows through the star. House and star are one path with
+       fill-rule="evenodd" rather than a <mask>: Chromium does not paint SVG
+       masks when the file is used as a CSS background-image, which is how the
+       sidebar and the chat avatar both draw this.
+       The ramp stays inside the accent's own colour — pale lime, the accent
+       itself, deeper lime — so the mark sits with the UI instead of drifting
+       green beside it. -->
+  <defs>
+    <linearGradient id="friday-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2fbc6"/>
+      <stop offset=".45" stop-color="#e3f39b"/>
+      <stop offset="1" stop-color="#c2da6c"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#friday-fill)" fill-rule="evenodd"
+        d="M64 8 Q70 8 74.5 11.5 L117 46 Q123 51 123 59 V102 Q123 118 107 118 H21 Q5 118 5 102 V59 Q5 51 11 46 L53.5 11.5 Q58 8 64 8 Z
+           M64 42 Q70.4 67.6 96 74 Q70.4 80.4 64 106 Q57.6 80.4 32 74 Q57.6 67.6 64 42 Z"/>
+</svg>

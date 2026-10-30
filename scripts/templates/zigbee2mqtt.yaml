@@ -1,0 +1,26 @@
+# Zigbee2MQTT settings for Friday. scripts/install.sh copies this to
+# data/zigbee2mqtt/configuration.yaml. GENERATE makes Zigbee2MQTT pick a
+# fresh network key and IDs on first start; back up data/zigbee2mqtt after
+# that, since losing them means re-pairing every device.
+version: 5
+homeassistant:
+  enabled: false
+permit_join: false
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://mosquitto:1883
+serial:
+  # The dongle is mapped here by docker-compose.zigbee.yml (ZIGBEE_DONGLE).
+  port: /dev/ttyUSB0
+  # ember for SONOFF ZBDongle-E / Dongle Lite MG21 (and most new sticks);
+  # zstack for ZBDongle-P and other TI CC2652 sticks.
+  adapter: ember
+frontend:
+  enabled: true
+  port: 8080
+advanced:
+  network_key: GENERATE
+  pan_id: GENERATE
+  ext_pan_id: GENERATE
+  channel: 20
+  log_level: info

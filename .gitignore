@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+data/
+config.toml
+.env
+
+
+# Backups of .env can contain live credentials.
+.env.*
+!.env.example
+
+# Local test output and editor/agent state.
+voice-test.mp3
+*.part
+.claude/
+.vscode/

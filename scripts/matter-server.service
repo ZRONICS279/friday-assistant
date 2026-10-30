@@ -1,0 +1,23 @@
+# systemd user unit for running the Matter controller separately from
+# house-agent (set manage = false under [matter] in config.toml; by default
+# house-agent starts and stops matter-server itself). Install with:
+#   mkdir -p ~/.config/systemd/user
+#   sed "s#@FRIDAY_DIR@#$PWD#g" scripts/matter-server.service > ~/.config/systemd/user/matter-server.service
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now matter-server
+#   loginctl enable-linger $USER   # keep it running when nobody is logged in
+[Unit]
+Description=Matter controller (matter-server) for house-agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=@FRIDAY_DIR@/scripts/matter-server.sh
+# Capture the pairing list as it was at shutdown; the wrapper restores it at
+# the next start if the live file has meanwhile lost every device.
+ExecStopPost=/usr/bin/python3 @FRIDAY_DIR@/scripts/matter-storage-guard.py snapshot %h/.matter_server
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

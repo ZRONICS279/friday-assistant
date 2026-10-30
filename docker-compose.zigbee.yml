@@ -1,0 +1,49 @@
+# Zigbee stack: mosquitto (MQTT broker) + Zigbee2MQTT driving a USB Zigbee
+# coordinator (SONOFF ZBDongle-E / Dongle Lite, or similar).
+#
+# Set ZIGBEE_DONGLE in .env to your dongle's stable path:
+#   ls /dev/serial/by-id/
+# scripts/install.sh writes the mosquitto and Zigbee2MQTT configs into data/.
+#
+# house-agent starts this itself when [docker] manage = true, and stops it
+# again when it exits. To run it by hand instead:
+#   docker compose -f docker-compose.zigbee.yml -f docker-compose.tts.yml up -d
+# (both files together: they share one project, so Compose calls the other
+# file's containers orphans if you pass only one.)
+#
+# Frontend (pairing UI, network map): http://127.0.0.1:8080
+# house-agent's [zigbee] backend talks to mosquitto on 127.0.0.1:1883.
+#
+# restart: on-failure, not unless-stopped -- a crashed container comes back,
+# but a machine that reboots does not start these behind house-agent's back.
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: house-agent-mosquitto
+    restart: on-failure
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./data/mosquitto/config:/mosquitto/config
+      - mosquitto-data:/mosquitto/data
+
+  zigbee2mqtt:
+    image: ghcr.io/koenkk/zigbee2mqtt:latest
+    container_name: house-agent-zigbee2mqtt
+    restart: on-failure
+    depends_on:
+      - mosquitto
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./data/zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
+    devices:
+      # The dongle's stable by-id path (ZIGBEE_DONGLE in .env); it shows up
+      # as /dev/ttyUSB0 inside the container to match configuration.yaml.
+      - ${ZIGBEE_DONGLE:-/dev/ttyUSB0}:/dev/ttyUSB0
+    environment:
+      TZ: ${TZ:-UTC}
+
+volumes:
+  mosquitto-data:

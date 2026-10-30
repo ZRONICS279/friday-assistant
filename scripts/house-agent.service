@@ -1,0 +1,30 @@
+# systemd user unit so house-agent (and the Matter controller it manages)
+# comes back by itself after a reboot or a power cut, and its automations
+# carry on: schedules live in the database, a fade under way is resumed
+# from where the clock says it should be, and a light change that came due
+# while the machine was off is still applied for a few hours afterwards.
+# scripts/install.sh sets this up when you say yes to "start on boot". By hand
+# (@FRIDAY_DIR@ is the folder you cloned Friday into):
+#   mkdir -p ~/.config/systemd/user
+#   sed "s#@FRIDAY_DIR@#$PWD#g" scripts/house-agent.service > ~/.config/systemd/user/house-agent.service
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now house-agent
+#   loginctl enable-linger $USER   # start at boot, not at login
+# Then stop the one running in a terminal first: two cannot share port 8787.
+# Logs: journalctl --user -u house-agent -f
+[Unit]
+Description=house-agent (Friday)
+After=network-online.target bluetooth.target docker.service
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=@FRIDAY_DIR@
+ExecStart=@FRIDAY_DIR@/.venv/bin/house-agent
+Restart=always
+RestartSec=5
+# Graceful shutdown finishes within seconds now; this is the backstop.
+TimeoutStopSec=20
+KillMode=mixed
+
+[Install]
+WantedBy=default.target

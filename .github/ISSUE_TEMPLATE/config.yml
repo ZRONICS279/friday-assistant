@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Commercial license
+    url: https://github.com/knightlie-code/friday/blob/main/COMMERCIAL.md
+    about: Using Friday in a product, service or business

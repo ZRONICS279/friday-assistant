@@ -1,0 +1,37 @@
+# Local speech for Friday without an NVIDIA GPU: Kokoro (text-to-speech) and
+# a smaller Whisper (speech-to-text) on the CPU. Use this file in place of
+# docker-compose.tts.yml in config.toml's [docker] compose_files, and set
+#   STT_MODEL=Systran/faster-distil-whisper-small.en
+# in .env. Replies take a second or two longer to be heard than on a GPU.
+services:
+  kokoro:
+    image: hwdsl2/kokoro-server
+    container_name: house-agent-kokoro
+    restart: on-failure
+    ports:
+      - "127.0.0.1:8880:8880"
+    environment:
+      KOKORO_API_KEY: local
+      KOKORO_VOICE: af_bella
+      KOKORO_SPEED: "0.96"
+      KOKORO_LANG_CODE: a
+      KOKORO_DISABLE_USAGE_COUNTS: "1"
+    volumes:
+      - kokoro-data:/var/lib/kokoro
+
+  whisper:
+    image: ghcr.io/speaches-ai/speaches:latest-cpu
+    container_name: house-agent-whisper
+    restart: on-failure
+    ports:
+      - "127.0.0.1:8001:8000"
+    environment:
+      WHISPER__MODEL: Systran/faster-distil-whisper-small.en
+      WHISPER__INFERENCE_DEVICE: cpu
+      WHISPER__COMPUTE_TYPE: int8
+    volumes:
+      - whisper-cache:/home/ubuntu/.cache/huggingface
+
+volumes:
+  kokoro-data:
+  whisper-cache:

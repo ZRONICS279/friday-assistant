@@ -1,0 +1,46 @@
+# Local speech for Friday: Kokoro (text-to-speech) and Whisper via speaches
+# (speech-to-text), both on 127.0.0.1 only. house-agent starts these itself
+# when [docker] manage = true. This file runs Whisper on an NVIDIA GPU; use
+# docker-compose.tts-cpu.yml on a machine without one.
+services:
+  kokoro:
+    image: hwdsl2/kokoro-server
+    container_name: house-agent-kokoro
+    restart: on-failure
+    ports:
+      - "127.0.0.1:8880:8880"
+    environment:
+      KOKORO_API_KEY: local
+      KOKORO_VOICE: af_bella
+      KOKORO_SPEED: "0.96"
+      KOKORO_LANG_CODE: a
+      KOKORO_DISABLE_USAGE_COUNTS: "1"
+    volumes:
+      - kokoro-data:/var/lib/kokoro
+
+  # Speech-to-text. OpenAI-compatible /v1/audio/transcriptions, which is what
+  # SpeechToText.transcribe posts to. Needs an NVIDIA GPU and the NVIDIA
+  # Container Toolkit; without one use docker-compose.tts-cpu.yml instead.
+  whisper:
+    image: ghcr.io/speaches-ai/speaches:latest-cuda
+    container_name: house-agent-whisper
+    restart: on-failure
+    ports:
+      - "127.0.0.1:8001:8000"
+    environment:
+      WHISPER__MODEL: Systran/faster-whisper-large-v3
+      WHISPER__INFERENCE_DEVICE: cuda
+      WHISPER__COMPUTE_TYPE: int8_float16
+    volumes:
+      - whisper-cache:/home/ubuntu/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [gpu]
+
+volumes:
+  kokoro-data:
+  whisper-cache:

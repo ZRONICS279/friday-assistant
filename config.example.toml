@@ -1,0 +1,262 @@
+[server]
+# 0.0.0.0 lets phones and laptops on your Wi-Fi reach Friday at
+# https://friday.local:8787 (the pairing code below keeps strangers out).
+# Use "127.0.0.1" to allow this computer only. Never forward this port on
+# your router; use a VPN such as Tailscale to reach Friday from outside.
+host = "0.0.0.0"
+port = 8787
+# Browsers only allow the microphone over HTTPS. scripts/make-cert.sh makes
+# these files; until it has run, Friday serves plain HTTP instead.
+ssl_certfile = "data/certs/cert.pem"
+ssl_keyfile = "data/certs/key.pem"
+# The name this computer answers to on the LAN (its hostname + ".local").
+public_host = "friday.local"
+# Pairing code every API call must carry. Leave empty to have one minted at
+# first start, printed in the log, and saved to .env as API_TOKEN.
+api_token = ""
+
+[llm]
+# Ollama: http://127.0.0.1:11434/v1
+# vLLM:   http://127.0.0.1:8000/v1
+base_url = "http://127.0.0.1:11434/v1"
+# house-qwen is built by scripts/install.sh from scripts/house-qwen.Modelfile
+# (qwen3:14b with a 32k window). Any Ollama model with tool calling works.
+# A cloud model (OpenAI, Anthropic, OpenRouter) can be picked in Settings.
+model = "house-qwen"
+api_key = "ollama"
+timeout_seconds = 120
+max_tool_rounds = 6
+# Context window of the model, in tokens. Turns are trimmed to fit it; the
+# real value is read from Ollama at startup when it is lower.
+context_tokens = 32768
+# Send each turn only the tool groups it needs, within this many tokens of
+# tool schemas (plus their guidance). Set route_tools = false to send all.
+route_tools = true
+tool_budget_tokens = 6000
+
+[speech]
+# Any OpenAI-compatible transcription endpoint. This may be the same server.
+base_url = "http://127.0.0.1:8001/v1"
+model = "whisper-1"
+api_key = "local"
+language = "en"
+timeout_seconds = 120
+
+[text_to_speech]
+base_url = "http://127.0.0.1:8880/v1"
+model = "tts-1"
+voice = "bf_isabella"
+api_key = "local"
+response_format = "mp3"
+speed = 1.25
+timeout_seconds = 120
+
+[catalog]
+region = "US"
+exact_episode_playback_enabled = false
+# Prefer environment variables so API credentials do not live in this file.
+# watchmode_api_key = ""
+# tmdb_token = ""
+
+# Televisions of any supported brand. platform is one of:
+#   roku      Roku TVs and boxes                (no pairing)
+#   webos     LG                                (accept the prompt on the TV)
+#   samsung   Samsung Tizen, 2016 and later     (accept the prompt on the TV)
+#   vizio     Vizio SmartCast, 2016 and later   (read back a PIN)
+#   androidtv Android TV / Google TV — Sony, Hisense, Philips, Nvidia Shield,
+#             TCL's Google TV models            (read back a 6-digit code)
+#   firetv    Amazon Fire TV                    (turn on ADB debugging first)
+#   appletv   Apple TV box only — the streaming device that plugs into an
+#             HDMI port. Apple makes no television sets, so a TV that merely
+#             has the Apple TV app installed is its own brand, and the app is
+#             launched with tv_launch_app.   (read back a PIN)
+# Brand words work too: platform = "LG", "Sony", "Fire TV" all resolve.
+#
+# Optional per-device fields:
+#   connected_to  the id of the TV a streaming box is plugged into
+#   input         which input on that TV it occupies, e.g. "HDMI 2"
+#                 With both set, launching something on the box switches that
+#                 TV to the right source first.
+#   mac           the TV's MAC address. Only LG and Samsung need it: those go
+#                 completely off the network when powered down, so waking them
+#                 takes a magic packet. Turn on Quick Start+ (LG) or Network
+#                 Standby (Samsung) as well, or the TV ignores it.
+# Omit port to use the platform's default. Ask Friday to pair a new TV and
+# follow what it shows on screen.
+# [[tv.devices]]
+# id = "bedroom"
+# name = "Bedroom TV"
+# host = "192.168.0.160"
+# platform = "lg"
+
+[calendar]
+# Calendars kept elsewhere that Friday should know about (read-only). Each is
+# an iCalendar URL: Google Calendar > Settings > (calendar) > "Secret address
+# in iCal format"; iCloud > share calendar > Public Calendar link; Outlook >
+# Publish calendar > ICS. The URL is the secret, so prefer CALENDAR_ICS_URLS
+# in .env (comma-separated) over listing them here.
+# subscriptions = ["https://calendar.google.com/calendar/ical/.../private-.../basic.ics"]
+refresh_minutes = 15
+horizon_days = 60          # how far ahead recurring events are expanded
+weather_heads_up = true    # quiet weather check an hour before each timed event
+
+[weather]
+# Open-Meteo forecasts and NWS alerts need no API key, only coordinates.
+# Four decimal places is street-level; three is plenty for a forecast.
+# Optional: with no coordinates here Friday asks once where the house is and
+# remembers it. Telling her you moved overrides whatever is set below.
+# latitude = 39.7392
+# longitude = -104.9903
+place = "home"
+units = "imperial"      # or "metric"
+alerts_enabled = true    # National Weather Service warnings, US-only
+
+[news]
+# Headlines and traffic on the home screen, read straight from the
+# publisher's RSS or Atom feed. No key, no account, no aggregator.
+# Leave [[news.feeds]] out entirely and Friday uses BBC World and NPR.
+enabled = true
+max_items = 12       # stories the home screen shows
+per_feed = 8         # how deep each feed is read before they are merged
+# [[news.feeds]]
+# name = "AP Top News"
+# url = "https://rsshub.app/apnews/topics/apf-topnews"
+# [[news.feeds]]
+# name = "Colorado DOT"
+# url = "https://www.cotrip.org/feeds/incidents.rss"
+# kind = "traffic"   # only a label: traffic items get their own heading
+
+[directions]
+# Travel time and distance. No API key: addresses come from Nominatim and
+# routes from OSRM, both run by the OpenStreetMap community. Uses the same
+# home location as the weather. An OpenRouteService key is optional — it
+# buys an availability guarantee the community servers do not offer, and
+# nothing else changes.
+units = "imperial"        # or "metric"
+# Live traffic needs a key — no free service offers it anonymously. Sign up at
+# developer.tomtom.com (free tier, no card) and paste the key here or set
+# TOMTOM_API_KEY. Only driving uses it; walking and cycling stay on OSRM.
+# tomtom_key = ""
+# Optional and unrelated to traffic: an availability guarantee only.
+# openrouteservice_key = ""
+
+[travel]
+# Live flights and hotels from LetsFG (letsfg.co), a search engine built for
+# agents; nothing runs locally beyond the HTTP calls. Hotel search needs no
+# setup. Flight search needs a free Bearer token: `pip install letsfg` then
+# `letsfg auth` once on this machine — a zero-amount card setup, nothing is
+# charged, searches are free — and the token is read from
+# ~/.letsfg/config.json. Or paste it here / set LETSFG_BEARER_TOKEN.
+# letsfg_token = ""
+currency = "USD"
+# A flight search fans out to hundreds of airlines and can take a minute or
+# two; the reply waits at most this long.
+timeout_seconds = 150
+
+[doordash]
+# Food, groceries, and household items ordered by voice through DoorDash's
+# own command-line tool, dd-cli (github.com/doordash-oss/doordash-cli — a
+# beta, by invitation). Download the linux-amd64 release, verify the
+# checksum, run its install.sh (it lands in ~/.local/bin/dd-cli), then sign
+# in once on this machine with `dd-cli login` (opens a browser, keeps the
+# token in the OS keychain). With no keychain, run `dd-cli export-token` on
+# any machine you can sign in on and put the token in .env as
+# DD_CLI_ACCESS_TOKEN. Friday searches, builds carts, and previews freely,
+# but places an order only after reading back the total and the card and
+# hearing a clear yes. Nothing DoorDash returns is stored in the database.
+enabled = true
+# binary = "/home/you/.local/bin/dd-cli"   # only if it is somewhere unusual
+timeout_seconds = 90
+announce_updates = true   # say when the store confirms, the Dasher is near, it lands
+
+[storage]
+database_path = "data/house-agent.db"
+
+[voice]
+# Who is talking, recognized locally on the CPU (no GPU, no cloud). Each chat
+# locks onto one speaker from its first couple of sentences; unknown voices are
+# asked once for a name and may stay anonymous. The lock re-opens if a clearly
+# different voice takes over part-way through.
+#
+# Enroll everyone who talks to it. With only one person enrolled there is no
+# rival voice for a match to beat, so the margin below never bites and a
+# stranger only has to clear the threshold -- which is how a second person in
+# the house ends up answering as the first. Run scripts/voice-check.py with a
+# few clips per person to measure where the threshold belongs on your own
+# microphones, and re-enroll everyone after changing these numbers.
+enabled = true
+model_path = "data/models/wespeaker_en_voxceleb_resnet34_LM.onnx"
+threshold = 0.62           # similarity needed to accept a match (raise if strangers match)
+margin = 0.08              # best match must beat the runner-up by this much
+min_speech_seconds = 2.5   # evidence collected before deciding
+max_wait_seconds = 12.0    # decide anyway after this much audio
+adapt = true               # keep learning a voice from confident matches
+max_banked_seconds = 30.0  # how much of each person's speech to keep per profile.
+                           # Enrollment saves the first couple of seconds; every
+                           # confident match afterwards adds a little more, up to
+                           # this much, and a voice is matched against its closest
+                           # saved recording rather than an average of them.
+
+# Names for a Roku TV's inputs, so "switch to the xbox" works.
+[roku.inputs]
+# xbox = "InputHDMI2"
+# switch = "InputHDMI4"
+tv = "Home"
+"live tv" = "InputTuner"
+
+# TVs are easiest to add from the app (Settings > House > Scan network) or by
+# asking Friday "find my TV". To list one here by hand instead:
+# [[roku.devices]]
+# id = "living-room"
+# name = "Living Room TV"
+# host = "192.168.0.150"
+# port = 8060
+
+[matter]
+# Matter lights and plugs. Needs python-matter-server; scripts/install.sh
+# offers to set it up and turns this on.
+enabled = false
+url = "ws://127.0.0.1:5580/ws"
+# Set true when this machine has a Bluetooth adapter: brand-new Matter WiFi
+# devices then pair straight from the box, with the controller handing them
+# the home WiFi from HOUSE_WIFI_SSID / HOUSE_WIFI_PASSWORD in .env.
+bluetooth = false
+bluetooth_adapter = 0
+# house-agent starts matter-server itself (scripts/matter-server.sh) and stops
+# it on exit; set manage = false to run it as a separate service instead.
+manage = true
+
+[zigbee]
+# Zigbee lights, plugs and sensors through a USB coordinator (e.g. SONOFF
+# ZBDongle-E / Dongle Lite) and Zigbee2MQTT. Set ZIGBEE_DONGLE in .env, add
+# "docker-compose.zigbee.yml" to [docker] compose_files, then turn this on.
+enabled = false
+mqtt_host = "127.0.0.1"
+mqtt_port = 1883
+
+[docker]
+# The containers house-agent needs: mosquitto and Zigbee2MQTT for Zigbee,
+# kokoro and whisper for speech. With manage = true house-agent runs
+# `docker compose up -d` for them at start-up and stops them again on the way
+# out, so Ctrl-C leaves nothing behind. It costs about half a second of
+# start-up: `up -d` returns as soon as the containers are created, and every
+# backend reconnects on its own as the services finish coming up (two or three
+# seconds for mosquitto, about eleven for whisper's CUDA runtime).
+#
+# house-agent stops only what it started. A stack that was already running
+# when it booted is adopted and left running when it exits, so a
+# `docker compose up` you are debugging with survives.
+manage = true
+# Both files go to one `docker compose` invocation: they share a project, so
+# passing one alone makes Compose treat the other's containers as orphans.
+# Paths are relative to this config file.
+# Speech runs on the GPU by default. With no NVIDIA GPU use
+# "docker-compose.tts-cpu.yml" instead. Add "docker-compose.zigbee.yml" once
+# a Zigbee USB dongle is plugged in (see the README).
+compose_files = ["docker-compose.tts.yml"]
+# For podman: ["podman", "compose"]. For the old standalone v1 binary:
+# ["docker-compose"].
+command = ["docker", "compose"]
+# Generous, because a first run may be pulling images.
+start_timeout_seconds = 180
+stop_timeout_seconds = 30

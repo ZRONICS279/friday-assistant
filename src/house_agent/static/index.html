@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0b0f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Friday" />
+    <title>Friday</title>
+    <link rel="manifest" href="/static/manifest.webmanifest" />
+    <link rel="icon" href="/static/icon.svg?v=4" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/static/icon.svg?v=4" />
+    <link rel="stylesheet" href="/static/styles.css?v=51" />
+  </head>
+  <body data-view="chat" data-chat="idle">
+    <div class="app" id="app">
+      <nav class="rail" aria-label="Sections">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">Friday</span>
+        </div>
+        <div class="tabs" role="tablist">
+          <button class="tab" data-view="chat" role="tab" aria-selected="true" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5.5 20v-4H4z"/></svg>
+            <span>Chat</span>
+          </button>
+          <button class="tab" data-view="devices" role="tab" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21h6M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>
+            <span>Devices</span>
+          </button>
+          <button class="tab tab-talk" id="nav-talk" type="button" aria-label="Talk to Friday">
+            <span class="tab-talk-disc"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+          </button>
+          <button class="tab" data-view="tv" role="tab" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <span>Remote</span>
+          </button>
+          <button class="tab" data-view="home" role="tab" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+            <span>Planner</span>
+          </button>
+          <button class="tab" data-view="people" role="tab" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span>People</span>
+          </button>
+          <button class="tab" data-view="settings" role="tab" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+            <span>Settings</span>
+          </button>
+          <button class="tab tab-more" id="nav-more" type="button" aria-expanded="false" aria-controls="more-sheet">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg>
+            <span>More</span>
+          </button>
+        </div>
+        <div class="rail-foot" title="Runs on this house. Nothing leaves the LAN.">
+          <span class="state-light" id="state-light"></span>
+          <div class="rail-foot-text">
+            <span class="rail-foot-title">Local &amp; private</span>
+            <span class="brand-sub" id="system-state">Checking backend…</span>
+          </div>
+        </div>
+      </nav>
+
+      <main class="stage">
+        <!-- ===================== CHAT ===================== -->
+        <section class="view console" data-view="chat" aria-label="Chat">
+          <header class="view-head chat-head">
+            <div class="view-title">
+              <div class="chat-title">
+                <h1>Friday</h1>
+                <span class="user-pill" id="chat-user" hidden title="Who Friday is talking to">
+                  <span class="user-initial" aria-hidden="true"></span>
+                  <span id="chat-user-name"></span>
+                </span>
+              </div>
+              <p class="eyebrow chat-status"><span class="state-light" id="chat-light"></span><span id="chat-status">Connecting…</span></p>
+            </div>
+            <div class="chat-tools">
+              <div class="speaker-chip" id="speaker-chip" hidden aria-live="polite">
+                <span class="speaker-dot"></span>
+                <span id="speaker-name"></span>
+              </div>
+              <button class="ghost" id="history-toggle" type="button" aria-expanded="false" aria-controls="history">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 7v5l3 2"/></svg>
+                <span>History</span>
+              </button>
+              <button class="ghost new-chat" id="new-chat" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                <span>New chat</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- The phone's home screen. It stands in for the transcript while
+               the chat is empty, so the first thing a phone shows is the
+               house rather than a blank conversation. -->
+          <section class="dash" id="dash" aria-label="Home">
+            <header class="dash-hello">
+              <div class="dash-greet">
+                <h2 id="dash-greeting">Hello</h2>
+                <p class="dash-sub" id="dash-sub">Ask Friday anything, or tap the mic.</p>
+              </div>
+              <div class="dash-wx" id="dash-wx">
+                <span class="dash-clock" id="dash-clock"></span>
+                <span class="dash-wx-now">
+                  <span class="dash-wx-icon" id="dash-wx-icon" aria-hidden="true"></span>
+                  <span class="dash-wx-temp" id="dash-wx-temp"></span>
+                </span>
+                <span class="dash-wx-line" id="dash-wx-line"></span>
+              </div>
+            </header>
+
+            <div class="dash-grid">
+              <div class="dash-col">
+                <section class="dash-tile" id="dash-calendar">
+                  <header class="dash-tile-head">
+                    <h3>Calendar</h3>
+                    <button class="dash-open" type="button" data-go="home" aria-label="Open the planner">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                  </header>
+                  <ul class="dash-rows" id="dash-calendar-rows"></ul>
+                  <p class="dash-empty" id="dash-calendar-empty" hidden>Nothing this week.</p>
+                </section>
+
+                <section class="dash-tile" id="dash-automations">
+                  <header class="dash-tile-head">
+                    <h3>Automations</h3>
+                    <button class="dash-open" type="button" data-go="home" aria-label="Open the planner">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                  </header>
+                  <ul class="dash-rows" id="dash-automation-rows"></ul>
+                  <p class="dash-empty" id="dash-automations-empty" hidden>Nothing scheduled.</p>
+                </section>
+              </div>
+
+              <div class="dash-col">
+                <section class="dash-tile dash-tile-devices" id="dash-devices">
+                  <ul class="dash-devices" id="dash-device-rows"></ul>
+                  <p class="dash-empty" id="dash-devices-empty" hidden>No devices yet.</p>
+                  <button class="dash-more" type="button" data-go="devices">All devices</button>
+                </section>
+              </div>
+
+              <section class="dash-tile dash-briefing" id="dash-news">
+                <header class="dash-tile-head">
+                  <h3>Briefing</h3>
+                  <span class="dash-tile-sub" id="dash-news-sub"></span>
+                </header>
+                <ul class="dash-news" id="dash-news-rows"></ul>
+                <p class="dash-empty" id="dash-news-empty" hidden>No headlines right now.</p>
+              </section>
+            </div>
+
+          </section>
+
+          <section class="transcript" id="transcript" aria-label="Conversation">
+            <article class="message assistant">
+              <span class="message-role">FRIDAY</span>
+              <p>Hi, I'm Friday. Ask me anything, or tap Talk to speak hands-free.</p>
+            </article>
+          </section>
+
+          <div class="suggestions" id="suggestions" aria-label="Suggestions">
+            <button class="suggestion" type="button">Turn on the lights</button>
+            <button class="suggestion" type="button">Order food</button>
+            <button class="suggestion" type="button">Find something to watch</button>
+            <button class="suggestion" type="button">Set up a new device</button>
+            <button class="suggestion" type="button">What's on this week?</button>
+          </div>
+
+          <section class="tool-trace" id="tool-trace" hidden>
+            <button id="trace-toggle" type="button" aria-expanded="false">Actions <span>0</span></button>
+            <pre id="trace-output" hidden></pre>
+          </section>
+
+          <form class="command-bar" id="command-form">
+            <label class="sr-only" for="command">Command</label>
+            <input
+              id="command"
+              name="command"
+              type="text"
+              maxlength="4000"
+              autocomplete="off"
+              placeholder="Ask Friday anything…"
+            />
+            <button class="convo-launch" id="convo-button" type="button"
+                    aria-label="Start hands-free conversation">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+              <span>Talk</span>
+            </button>
+            <button class="send" type="submit" aria-label="Send">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </button>
+          </form>
+          <p class="hint" id="hint">Everything stays on this machine.</p>
+
+          <aside class="chat-aside" aria-label="At a glance">
+            <section class="glance glance-today">
+              <div class="glance-top">
+                <div class="glance-clock">
+                  <p class="glance-date" id="glance-date"></p>
+                  <p class="glance-time" id="glance-time"></p>
+                </div>
+                <div class="wx" id="wx" hidden>
+                  <span class="wx-icon" id="wx-icon" aria-hidden="true"></span>
+                  <span class="wx-temp" id="wx-temp"></span>
+                </div>
+              </div>
+              <p class="wx-line" id="wx-line" hidden></p>
+              <div class="glance-next" id="glance-next" hidden>
+                <span class="glance-label">Next up</span>
+                <span class="glance-next-title" id="glance-next-title"></span>
+                <span class="glance-next-when" id="glance-next-when"></span>
+              </div>
+            </section>
+            <section class="glance glance-lights">
+              <header class="glance-head">
+                <h2>Lights</h2>
+                <span class="glance-count" id="glance-count"></span>
+              </header>
+              <ul class="glance-list" id="glance-lights"></ul>
+              <p class="empty" id="glance-empty" hidden>No lights yet.</p>
+              <button class="ghost glance-more" type="button" data-go="devices">All devices</button>
+            </section>
+          </aside>
+        </section>
+
+        <!-- ===================== DEVICES ===================== -->
+        <section class="view" data-view="devices" aria-label="Devices" hidden>
+          <header class="view-head">
+            <div class="view-title">
+              <h1>Devices</h1>
+              <p class="eyebrow" id="devices-summary">Lights and switches around the house</p>
+            </div>
+            <div class="view-actions">
+              <div class="backend-chips" id="backend-chips"></div>
+              <button class="ghost" id="devices-refresh" type="button" title="Refresh">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>
+              </button>
+              <button class="primary" id="devices-pair" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                <span>Add</span>
+              </button>
+            </div>
+          </header>
+          <div class="devices-layout" id="devices-layout">
+            <div class="view-body devices-main" id="devices-body">
+              <div class="pair-panel" id="pair-panel" hidden></div>
+              <div class="notice" id="devices-notice" hidden></div>
+              <div class="devices-bar">
+                <div class="room-chips" id="device-rooms" role="toolbar" aria-label="Rooms"></div>
+                <button class="ghost" id="devices-all-off" type="button" disabled>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8M6.3 6.6a8 8 0 1 0 11.4 0"/></svg>
+                  <span>All off</span>
+                </button>
+              </div>
+              <div class="device-grid" id="device-grid"></div>
+              <p class="empty empty-big" id="devices-empty" hidden>No smart devices yet. Add one with the button above, or tell Friday to pair a light.</p>
+            </div>
+            <aside class="device-detail" id="device-detail" hidden aria-label="Device controls"></aside>
+          </div>
+          <div class="sheet-scrim" id="device-scrim" hidden></div>
+        </section>
+
+        <!-- ===================== TV ===================== -->
+        <section class="view" data-view="tv" aria-label="TV remote" hidden>
+          <header class="view-head">
+            <div class="view-title">
+              <h1 id="tv-title">TV</h1>
+              <p class="eyebrow">Remote control</p>
+            </div>
+            <div class="view-actions">
+              <div class="tv-picker" id="tv-picker"></div>
+            </div>
+          </header>
+          <div class="view-body tv-body" id="tv-body">
+            <p class="empty" id="tv-empty" hidden>No TV is set up. Add one under Settings.</p>
+            <div class="remote" id="remote" hidden>
+              <div class="tv-status" id="tv-status">
+                <span class="tv-status-dot" id="tv-status-dot"></span>
+                <span id="tv-status-text">Checking…</span>
+              </div>
+              <div class="remote-row remote-top">
+                <button class="key key-power" data-key="power_off" data-alt="power_on" type="button" aria-label="Power">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9M6.3 6.6a8 8 0 1 0 11.4 0"/></svg>
+                </button>
+                <button class="key" data-key="home" type="button" aria-label="Home">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5M5 10v10h14V10"/></svg>
+                </button>
+                <button class="key" data-key="back" type="button" aria-label="Back">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 4 12l7 7M4 12h16"/></svg>
+                </button>
+                <button class="key" data-key="info" type="button" aria-label="Options">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v.01M12 10v8"/><circle cx="12" cy="12" r="9"/></svg>
+                </button>
+              </div>
+              <div class="remote-main">
+                <div class="trackpad" id="trackpad" aria-label="Trackpad: slide to move, tap to select">
+                  <div class="trackpad-grid"></div>
+                  <div class="trackpad-hint" id="trackpad-hint">Swipe to move · tap to select</div>
+                  <div class="trackpad-arrow" id="trackpad-arrow" aria-hidden="true"></div>
+                </div>
+                <div class="volume" id="volume" aria-label="Volume: slide up or down">
+                  <span class="volume-label">VOL</span>
+                  <div class="volume-track">
+                    <div class="volume-knob" id="volume-knob"></div>
+                  </div>
+                  <button class="key key-mute" data-key="mute" type="button" aria-label="Mute">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16 9l4 6M20 9l-4 6"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="remote-row remote-media">
+                <button class="key" data-key="rewind" type="button" aria-label="Rewind">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 6 3 12l8 6zM21 6l-8 6 8 6z"/></svg>
+                </button>
+                <button class="key key-wide" data-key="play_pause" type="button" aria-label="Play or pause">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14l10-7zM19 5v14"/></svg>
+                </button>
+                <button class="key" data-key="forward" type="button" aria-label="Fast forward">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 6l8 6-8 6zM3 6l8 6-8 6z"/></svg>
+                </button>
+              </div>
+              <section class="recents" id="tv-recents" hidden aria-label="Recently used apps">
+                <h2 class="recents-head">Recent</h2>
+                <div class="recents-list" id="tv-recents-list"></div>
+              </section>
+              <div class="remote-extras">
+                <div class="segments" id="tv-segments" role="tablist">
+                  <button class="segment" data-panel="apps" role="tab" aria-selected="true" type="button">Apps</button>
+                  <button class="segment" data-panel="inputs" role="tab" type="button">Inputs</button>
+                  <button class="segment" data-panel="keyboard" role="tab" type="button">Keyboard</button>
+                </div>
+                <div class="panel" data-panel="apps">
+                  <label class="app-search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <span class="sr-only">Find an app</span>
+                    <input type="text" id="tv-app-filter" placeholder="Find an app" autocomplete="off" />
+                  </label>
+                  <div class="app-groups" id="tv-apps"></div>
+                </div>
+                <div class="panel" data-panel="inputs" hidden>
+                  <div class="tiles" id="tv-inputs"></div>
+                </div>
+                <div class="panel" data-panel="keyboard" hidden>
+                  <form class="inline-form" id="tv-type-form">
+                    <input type="text" id="tv-type" maxlength="256" placeholder="Type into the TV's search…" autocomplete="off" />
+                    <button class="primary" type="submit">Send</button>
+                  </form>
+                  <p class="muted panel-note">Open a search field on the TV first, then send.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== HOME ===================== -->
+        <section class="view" data-view="home" aria-label="Home" hidden>
+          <header class="view-head">
+            <div class="view-title">
+              <h1>Planner</h1>
+              <p class="eyebrow">Calendar, lists and automations</p>
+            </div>
+            <div class="view-actions">
+              <button class="ghost" id="home-refresh" type="button" title="Refresh">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>
+              </button>
+            </div>
+          </header>
+          <div class="view-body home-body" id="home-body">
+            <div class="stats" id="home-stats">
+              <button class="stat" type="button" data-jump="card-calendar">
+                <span class="stat-label">Next up</span>
+                <span class="stat-value" id="stat-next">—</span>
+                <span class="stat-sub" id="stat-next-when"></span>
+              </button>
+              <button class="stat" type="button" data-jump="card-automations">
+                <span class="stat-label">Automations</span>
+                <span class="stat-value" id="stat-automations">—</span>
+                <span class="stat-sub" id="stat-automations-sub"></span>
+              </button>
+              <button class="stat" type="button" data-jump="card-lists">
+                <span class="stat-label">Lists</span>
+                <span class="stat-value" id="stat-lists">—</span>
+                <span class="stat-sub" id="stat-lists-sub"></span>
+              </button>
+            </div>
+            <div class="home-columns">
+              <div class="home-stack">
+              <section class="card" id="card-calendar">
+                <header class="card-head"><h2>Coming up</h2><span class="card-sub">next 7 days</span></header>
+                <div class="days" id="calendar-days"></div>
+                <p class="empty" id="calendar-empty" hidden>Nothing on the calendar this week.</p>
+                </section>
+                <section class="card" id="card-lists">
+                  <header class="card-head"><h2>Lists</h2>
+                    <form class="inline-form small" id="list-new-form">
+                      <input type="text" id="list-new-name" maxlength="40" placeholder="New list…" autocomplete="off" />
+                      <button class="ghost" type="submit">Create</button>
+                    </form>
+                  </header>
+                  <div class="list-tabs" id="list-tabs"></div>
+                  <div id="lists-body"></div>
+                  <p class="empty" id="lists-empty" hidden>No lists yet. Create one, or say "add milk to the shopping list".</p>
+                </section>
+              </div>
+                <section class="card" id="card-automations">
+                  <header class="card-head"><h2>Automations</h2><span class="card-sub" id="automations-sub"></span></header>
+                  <div class="group" id="automations-active">
+                    <h3 class="group-head">Active</h3>
+                    <ul class="rows"></ul>
+                  </div>
+                  <div class="group" id="automations-paused" hidden>
+                    <h3 class="group-head">Paused</h3>
+                    <ul class="rows"></ul>
+                  </div>
+                  <p class="empty" id="automations-empty" hidden>Nothing scheduled. Ask Friday to remind you, set a timer, or fade the lights at bedtime.</p>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== PEOPLE ===================== -->
+        <section class="view" data-view="people" aria-label="People" hidden>
+          <header class="view-head">
+            <div class="view-title">
+              <h1>People</h1>
+              <p class="eyebrow">Who lives here and how Friday treats them</p>
+            </div>
+            <div class="view-actions">
+              <form class="inline-form small" id="person-add-form">
+                <input type="text" id="person-add-name" maxlength="80" placeholder="Add a person…" autocomplete="off" />
+                <button class="primary" type="submit">Add</button>
+              </form>
+            </div>
+          </header>
+          <div class="view-body people-body">
+            <ul class="people-list" id="people-list"></ul>
+            <section class="person" id="person" hidden>
+              <header class="person-head">
+                <button class="ghost person-back" id="person-back" type="button" aria-label="Back to people">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                </button>
+                <div>
+                  <p class="eyebrow" id="person-eyebrow">Person</p>
+                  <h2 id="person-name"></h2>
+                </div>
+                <div class="person-voice" id="person-voice"></div>
+              </header>
+              <div class="cards">
+                <section class="card">
+                  <header class="card-head"><h2>Rules for Friday</h2><span class="card-sub">followed on every turn</span></header>
+                  <p class="card-note">Standing instructions, in your own words. "Never turn the bedroom light on after 10pm." "Always confirm before ordering food."</p>
+                  <ul class="notes" id="notes-rule"></ul>
+                  <form class="inline-form" data-kind="rule">
+                    <input type="text" maxlength="500" placeholder="Add a rule…" autocomplete="off" />
+                    <button class="primary" type="submit">Add</button>
+                  </form>
+                </section>
+                <section class="card">
+                  <header class="card-head"><h2>How to talk to me</h2><span class="card-sub">reply style</span></header>
+                  <p class="card-note">How replies should sound. "Keep it short." "Skip the years when you list movies."</p>
+                  <ul class="notes" id="notes-style"></ul>
+                  <form class="inline-form" data-kind="style">
+                    <input type="text" maxlength="500" placeholder="Add a style preference…" autocomplete="off" />
+                    <button class="primary" type="submit">Add</button>
+                  </form>
+                </section>
+                <section class="card">
+                  <header class="card-head"><h2>Likes &amp; tastes</h2><span class="card-sub">shapes recommendations</span></header>
+                  <p class="card-note">What you enjoy and avoid. Friday uses these when picking something to watch or eat.</p>
+                  <ul class="notes" id="notes-taste"></ul>
+                  <form class="inline-form" data-kind="taste">
+                    <input type="text" maxlength="500" placeholder="Add a preference…" autocomplete="off" />
+                    <button class="primary" type="submit">Add</button>
+                  </form>
+                </section>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ===================== SETTINGS ===================== -->
+        <section class="view" data-view="settings" aria-label="Settings" hidden>
+          <header class="view-head">
+            <div class="view-title">
+              <h1>Settings</h1>
+              <p class="eyebrow">Friday, the house, and what it is signed in to</p>
+            </div>
+            <div class="view-actions">
+              <button class="ghost" id="settings-refresh" type="button" title="Refresh">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>
+              </button>
+            </div>
+          </header>
+          <div class="view-body settings-body">
+            <div class="segments settings-tabs" id="settings-tabs" role="tablist">
+              <button class="segment" data-settings-tab="assistant" role="tab" type="button" aria-selected="true">Assistant</button>
+              <button class="segment" data-settings-tab="house" role="tab" type="button">House</button>
+              <button class="segment" data-settings-tab="accounts" role="tab" type="button">Accounts</button>
+              <button class="segment" data-settings-tab="system" role="tab" type="button">System</button>
+            </div>
+            <section class="settings-panel" data-settings="assistant">
+              <p class="settings-blurb">Which AI answers, and how Friday sounds</p>
+              <div class="cards">
+            <section class="card card-wide" id="card-model">
+              <header class="card-head"><h2>Assistant model</h2><span class="card-sub" id="model-current"></span></header>
+              <p class="card-note">Which AI answers when you talk to Friday. Speech recognition and Friday's voice always run on this computer.</p>
+
+              <div class="model-pick">
+                <button class="model-open" id="model-open" type="button" aria-expanded="false" aria-haspopup="listbox">
+                  <span class="model-open-text">
+                    <strong id="model-open-name">—</strong>
+                    <small id="model-open-where"></small>
+                  </span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="model-menu" id="model-menu" hidden role="listbox" aria-label="Models">
+                  <label class="model-search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <span class="sr-only">Search models</span>
+                    <input type="text" id="model-search" placeholder="Search every model…" autocomplete="off" spellcheck="false" />
+                  </label>
+                  <div class="model-groups" id="model-groups"></div>
+                  <p class="model-menu-empty" id="model-menu-empty" hidden>Nothing matches.</p>
+                </div>
+              </div>
+              <div class="privacy-warning" id="model-warning" hidden role="alert">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17v.01"/></svg>
+                <div>
+                  <strong>Your conversations will no longer be private.</strong>
+                  <p id="model-warning-text"></p>
+                </div>
+              </div>
+              <form class="model-form" id="model-form">
+                <label class="model-field" id="model-url-row" hidden>Endpoint address
+                  <input type="url" id="model-url" placeholder="http://192.168.0.20:8000/v1" autocomplete="off" spellcheck="false" />
+                </label>
+                <label class="model-field" id="model-name-row" hidden>Model name
+                  <input type="text" id="model-name-input" placeholder="as the endpoint calls it, e.g. hermes-4-70b" autocomplete="off" spellcheck="false" />
+                </label>
+                <label class="model-field" id="model-key-row">API key
+                  <span class="model-key-line">
+                    <input type="password" id="model-key" autocomplete="off" spellcheck="false" />
+                    <button class="ghost tiny danger" id="model-key-forget" type="button" hidden>Remove key</button>
+                  </span>
+                </label>
+                <label class="consent" id="model-consent-row" hidden>
+                  <input type="checkbox" id="model-consent" />
+                  <span id="model-consent-text"></span>
+                </label>
+                <div class="model-actions">
+                  <span class="muted" id="model-result" aria-live="polite"></span>
+                  <button class="primary" type="submit" id="model-save">Test &amp; switch</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card card-wide" id="card-voice">
+              <header class="card-head"><h2>Friday's voice</h2><span class="card-sub" id="voice-current"></span></header>
+              <p class="card-note">Generated on this computer. Tap any voice in the list to hear it read a line before you keep it.</p>
+
+              <div class="model-pick voice-pick">
+                <button class="model-open" id="voice-open" type="button" aria-expanded="false" aria-haspopup="listbox">
+                  <span class="model-open-text">
+                    <strong id="voice-open-name">—</strong>
+                    <small id="voice-open-where"></small>
+                  </span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="model-menu" id="voice-menu" hidden role="listbox" aria-label="Voices">
+                  <label class="model-search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <span class="sr-only">Search voices</span>
+                    <input type="text" id="voice-search" placeholder="Search voices…" autocomplete="off" />
+                  </label>
+                  <div class="model-groups" id="voice-groups"></div>
+                  <p class="model-menu-empty" id="voice-empty" hidden>No voices came back from the speech server.</p>
+                </div>
+              </div>
+              <p class="muted voice-note" id="voice-note"></p>
+            </section>
+
+            <section class="card card-wide" id="card-web-fallback">
+              <header class="card-head"><h2>Features without a key</h2><span class="card-sub">web search stands in</span></header>
+              <p class="card-note">Some features work best with their own free API key. For each one without a key, choose whether Friday looks it up on the web instead (and says so, since web results can be less accurate), or tells you the key is missing. Weather, directions and news never need a key.</p>
+              <ul class="rows" id="web-fallback-list"></ul>
+            </section>
+
+            <section class="card" id="card-voices">
+              <header class="card-head"><h2>Recognised speakers</h2><span class="card-sub">voices Friday can tell apart</span></header>
+              <ul class="rows" id="voices-list"></ul>
+              <p class="empty" id="voices-empty" hidden>Nobody enrolled yet. Say hello and your name in a chat.</p>
+            </section>
+              </div>
+            </section>
+            <section class="settings-panel" data-settings="house" hidden>
+              <p class="settings-blurb">Televisions and the network new devices join</p>
+              <div class="cards">
+            <section class="card" id="card-tvs">
+              <header class="card-head"><h2>Televisions</h2>
+                <div class="card-actions">
+                  <button class="ghost" id="tv-discover" type="button">Scan network</button>
+                  <button class="primary" id="tv-add" type="button">Add TV</button>
+                </div>
+              </header>
+              <div class="found" id="tv-found" hidden></div>
+              <form class="edit-form" id="tv-add-form" hidden>
+                <label>Name<input type="text" name="name" maxlength="80" placeholder="Living Room TV" required /></label>
+                <label>Address<input type="text" name="host" maxlength="253" placeholder="192.168.0.203" required /></label>
+                <label>Port<input type="number" name="port" min="1" max="65535" placeholder="auto" /></label>
+                <label>Brand
+                  <select name="platform">
+                    <option value="roku">Roku</option>
+                    <option value="webos">LG (webOS)</option>
+                    <option value="samsung">Samsung</option>
+                    <option value="vizio">Vizio</option>
+                    <option value="androidtv">Android TV</option>
+                    <option value="firetv">Fire TV</option>
+                    <option value="appletv">Apple TV</option>
+                  </select>
+                </label>
+                <label>Id<input type="text" name="id" maxlength="60" placeholder="living-room" /></label>
+                <div class="edit-actions">
+                  <button class="ghost" type="button" data-cancel>Cancel</button>
+                  <button class="primary" type="submit">Save TV</button>
+                </div>
+              </form>
+              <ul class="rows" id="tv-list"></ul>
+              <p class="empty" id="tv-list-empty" hidden>No TVs saved. Add one, or scan the network.</p>
+            </section>
+
+            <section class="card" id="card-wifi">
+              <header class="card-head"><h2>Wi‑Fi for new devices</h2>
+                <div class="card-actions"><button class="ghost" id="wifi-edit" type="button">Change</button></div>
+              </header>
+              <div class="kv" id="wifi-status"></div>
+              <form class="edit-form" id="wifi-form" hidden>
+                <label>Network<input type="text" name="ssid" maxlength="64" required /></label>
+                <label>Password<input type="password" name="password" maxlength="128" required /></label>
+                <div class="edit-actions">
+                  <button class="ghost" type="button" data-cancel>Cancel</button>
+                  <button class="primary" type="submit">Save</button>
+                </div>
+              </form>
+            </section>
+              </div>
+            </section>
+            <section class="settings-panel" data-settings="accounts" hidden>
+              <p class="settings-blurb">Services Friday orders and books through</p>
+              <div class="cards">
+            <section class="card" id="card-doordash">
+              <header class="card-head"><h2>DoorDash</h2>
+                <div class="card-actions">
+                  <button class="ghost" id="dd-check" type="button">Check account</button>
+                  <button class="primary" id="dd-login" type="button">Sign in</button>
+                </div>
+              </header>
+              <div class="kv" id="dd-status"></div>
+              <div class="dd-login" id="dd-login-panel" hidden></div>
+              <form class="inline-form" id="dd-callback-form">
+                <input type="text" id="dd-callback" placeholder="Paste the http://localhost:4180/… address after signing in on a phone" autocomplete="off" />
+                <button class="ghost" type="submit">Finish</button>
+              </form>
+            </section>
+              </div>
+            </section>
+            <section class="settings-panel" data-settings="system" hidden>
+              <p class="settings-blurb">What is running on this computer</p>
+              <div class="cards">
+            <section class="card" id="card-system">
+              <header class="card-head"><h2>System</h2></header>
+              <div class="kv" id="system-status"></div>
+            </section>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Past chats: a drawer beside the chat. -->
+    <aside class="history" id="history" hidden aria-label="Past chats">
+      <header class="history-head">
+        <div>
+          <h2>History</h2>
+        </div>
+        <button class="icon-btn" id="history-close" type="button" aria-label="Close history">&#10005;</button>
+      </header>
+      <p class="history-hint">Tap to reopen. Swipe left, or use the bin, to delete.</p>
+      <ol class="history-list" id="history-list"></ol>
+      <p class="empty" id="history-empty" hidden>No chats yet.</p>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <div class="convo-overlay" id="convo" hidden data-state="idle">
+      <button class="convo-exit" id="convo-exit" type="button" aria-label="End conversation">&#10005;</button>
+      <p class="convo-who" id="convo-who" hidden>
+        <span class="user-initial" aria-hidden="true"></span>
+        <span>Talking with <strong id="convo-who-name"></strong></span>
+      </p>
+      <canvas class="convo-orb" id="convo-orb"></canvas>
+      <p class="convo-status" id="convo-status"></p>
+      <button class="convo-mute" id="convo-mute" type="button" aria-pressed="false">Mute mic</button>
+    </div>
+    <!-- Messages from Friday: a floating envelope in the bottom corner and the
+         popup it opens. Placed after the convo screen so they layer over it and
+         the conversation keeps going underneath. -->
+    <button class="inbox-toggle" id="inbox-toggle" type="button" aria-expanded="false"
+            aria-label="Messages from Friday" title="Messages from Friday">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"
+              d="M4 5.5h16v10.5H9.5L5.5 20v-4H4z"/>
+      </svg>
+      <span class="inbox-badge" id="inbox-badge" hidden>0</span>
+    </button>
+    <section class="inbox" id="inbox" hidden role="dialog" aria-label="Messages from Friday">
+      <header class="inbox-head">
+        <div>
+          <p class="eyebrow">Links and notes Friday sent you</p>
+          <h2>Messages</h2>
+        </div>
+        <button class="inbox-close icon-btn" id="inbox-close" type="button" aria-label="Close messages">&#10005;</button>
+      </header>
+      <p class="inbox-empty" id="inbox-empty">Nothing yet. Links and instructions Friday sends you land here.</p>
+      <ol class="inbox-list" id="inbox-list"></ol>
+    </section>
+    <div class="more-sheet" id="more-sheet" hidden role="dialog" aria-label="More">
+      <span class="sheet-grip" aria-hidden="true"></span>
+      <nav class="more-list">
+        <button class="more-item" type="button" data-go="home">
+          <span class="more-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+          <span class="more-text"><strong>Planner</strong><small>Calendar, lists and automations</small></span>
+        </button>
+        <button class="more-item" type="button" data-go="people">
+          <span class="more-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+          <span class="more-text"><strong>People</strong><small>Rules, style and tastes</small></span>
+        </button>
+        <button class="more-item" type="button" data-go="settings">
+          <span class="more-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></span>
+          <span class="more-text"><strong>Settings</strong><small>TVs, accounts and system</small></span>
+        </button>
+      </nav>
+      <p class="more-status"><span class="state-light" id="more-light"></span><span id="more-status">Checking backend…</span></p>
+    </div>
+    <div class="sheet-scrim more-scrim" id="more-scrim" hidden></div>
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+    <section class="pairing" id="pairing" hidden role="dialog" aria-label="Pair this screen">
+      <form class="pairing-card card" id="pairing-form">
+        <p class="card-sub">Pair this screen</p>
+        <h2>Enter Friday's pairing code</h2>
+        <p class="card-note">It is printed when house-agent starts (“Pairing code for the web app”) and kept in the house's .env as API_TOKEN.</p>
+        <label class="sr-only" for="pairing-code">Pairing code</label>
+        <input id="pairing-code" name="code" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="pairing code" />
+        <p class="pairing-error" id="pairing-error" hidden>That code did not match.</p>
+        <button class="pairing-submit" type="submit">Pair</button>
+      </form>
+    </section>
+
+    <script src="/static/auth.js?v=34" defer></script>
+    <script src="/static/ui.js?v=35" defer></script>
+    <script src="/static/app.js?v=39" defer></script>
+    <script src="/static/history.js?v=34" defer></script>
+    <script src="/static/devices.js?v=39" defer></script>
+    <script src="/static/tv.js?v=36" defer></script>
+    <script src="/static/home.js?v=36" defer></script>
+    <script src="/static/people.js?v=34" defer></script>
+    <script src="/static/settings.js?v=38" defer></script>
+    <script src="/static/glance.js?v=36" defer></script>
+    <script src="/static/model.js?v=6" defer></script>
+    <script src="/static/voice.js?v=2" defer></script>
+    <script src="/static/dash.js?v=5" defer></script>
+  </body>
+</html>

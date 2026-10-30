@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Friday">
+  <!-- App and browser-tab icon: the same mark inset on the app's own charcoal,
+       so the star reads as cut out of the house rather than floating. -->
+  <defs>
+    <linearGradient id="friday-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2fbc6"/>
+      <stop offset=".45" stop-color="#e3f39b"/>
+      <stop offset="1" stop-color="#c2da6c"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#0a0b0f"/>
+  <path fill="url(#friday-fill)" fill-rule="evenodd"
+        d="M64 18 Q69 18 72.6 20.8 L106.6 48.8 Q111.4 52.8 111.4 59.2 V93.6 Q111.4 106.4 98.6 106.4 H29.4 Q16.6 106.4 16.6 93.6 V59.2 Q16.6 52.8 21.4 48.8 L55.4 20.8 Q59 18 64 18 Z
+           M64 45.2 Q69.1 65.7 89.6 70.8 Q69.1 75.9 64 96.4 Q58.9 75.9 38.4 70.8 Q58.9 65.7 64 45.2 Z"/>
+</svg>
